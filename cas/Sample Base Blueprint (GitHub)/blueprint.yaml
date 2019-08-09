@@ -1,59 +1,63 @@
 name: Sample Base Blueprint (GitHub)
 description: This is a sample blueprint that will be imported from GitHub. There should be at least two versions of listed within Cloud Assembly!
-version: 2
+version: 1
 formatVersion: 1
 inputs:
-  environment:
-    type: string
-    enum:
-      - 'env:dev'
-      - 'env:qa'
-      - 'env:prod'
-    description: Which environment should this request be provisioning into?
-    default: 'env:dev'
-    title: Environment
   cloud_type:
     type: string
-    enum:
-      - 'cloud_type:public'
-      - 'cloud_type:private'
-    default: 'cloud_type:private'
-    description: Should this request be satified by a private or public cloud platform?
     title: Cloud Type
+    description: Should this request be provisioned into a public or private cloud?
+    default: Private
+    enum:
+      - Private
+      - Public
+  environment:
+    type: string
+    title: Provisioning Environment
+    description: Which environment will this blueprint be provisioned into?
+    default: Dev
+    enum:
+      - Dev
+      - QA
+      - Prod
   flavor:
     type: string
-    enum:
-      - generic.tiny
-      - generic.small
-      - generic.medium
-      - generic.large
-    description: Size of the requested system
     title: System Size
-    default: generic.tiny
+    description: What t-shirt size to use for the web server?
+    default: Small
+    enum:
+      - Tiny
+      - Small
+      - Medium
+      - Large
   image:
     type: string
+    title: Operating System
+    description: What operating system to use for the web server?
+    default: CentOS 7
     enum:
       - CentOS 7
-      - Ubuntu 16.04
-    description: What operating system do you want to use for this request?
-    title: Operating System
-    default: CentOS 7
+      - Windows Server 2012 R2
+      - Windows Server 2016
+      - Ubuntu 16.04 LTS
+      - Ubuntu 18.04
 resources:
   Cloud_Network:
     type: Cloud.Network
     properties:
       networkType: existing
       constraints:
-        - tag: 'category:demo'
+        - tag: '${"cloud_type:"+to_lower(input.cloud_type)}'
   Cloud_Machine:
     type: Cloud.Machine
     properties:
-      customizationSpec: '${input.image == "CentOS 7" ? "KPSC-Linux" : "KPSC-Windows_Domain"}'
+      customizationSpec: '${starts_with(to_lower(input.image),"windows") == true ? "KPSC-Windows_Domain" : "KPSC-Linux"}'
       image: '${input.image}'
-      flavor: '${input.flavor}'
+      flavor: '${"generic."+to_lower(input.flavor)}'
       constraints:
-        - tag: '${input.cloud_type}'
-        - tag: '${input.environment}'
+        - tag: '${"cloud_type:"+to_lower(input.cloud_type)}'
+        - tag: '${"env:"+to_lower(input.environment)}'
       networks:
         - network: '${resource.Cloud_Network.id}'
           assignment: static
+          assignPublicIpAddress: false
