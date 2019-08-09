@@ -1,6 +1,6 @@
 name: Sample Base Blueprint (GitHub)
-description: This is a sample blueprint that should be a mirrof of the "Multi-Cloud Master" blueprint in Demo project. This variant is managed from within GitHub and imported. 
-version: 2
+description: This is a sample blueprint that should be a mirror of the "Multi-Cloud Master" blueprint in Demo project. This variant is managed from within GitHub and imported. 
+version: 3
 formatVersion: 1
 inputs:
   cloud_type:
