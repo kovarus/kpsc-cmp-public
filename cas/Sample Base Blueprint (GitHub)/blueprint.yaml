@@ -1,35 +1,44 @@
 name: Sample Base Blueprint (GitHub)
-description: This is a sample blueprint that will be imported from GitHub. There should be at least two versions of listed within Cloud Assembly!
-version: 1
+description: This is a sample blueprint that should be a mirrof of the "Multi-Cloud Master" blueprint in Demo project. This variant is managed from within GitHub and imported. 
+version: 2
 formatVersion: 1
 inputs:
   cloud_type:
     type: string
     title: Cloud Type
     description: Should this request be provisioned into a public or private cloud?
-    default: Private
-    enum:
-      - Private
-      - Public
+    default: 'cloud_type:public'
+    oneOf:
+      - title: Private
+        const: 'cloud_type:private'
+      - title: Public
+        const: 'cloud_type:public'
   environment:
     type: string
     title: Provisioning Environment
     description: Which environment will this blueprint be provisioned into?
-    default: Dev
-    enum:
-      - Dev
-      - QA
-      - Prod
+    default: 'env:dev'
+    oneOf:
+      - title: Development
+        const: 'env:dev'
+      - title: QA
+        const: 'env:qa'
+      - title: Production
+        const: 'env:prod'
   flavor:
     type: string
     title: System Size
     description: What t-shirt size to use for the web server?
-    default: Small
-    enum:
-      - Tiny
-      - Small
-      - Medium
-      - Large
+    default: generic.small
+    oneOf:
+      - title: Tiny
+        const: generic.tiny
+      - title: Small
+        const: generic.small
+      - title: Medium
+        const: generic.medium
+      - title: Large
+        const: generic.large
   image:
     type: string
     title: Operating System
@@ -47,16 +56,16 @@ resources:
     properties:
       networkType: existing
       constraints:
-        - tag: '${"cloud_type:"+to_lower(input.cloud_type)}'
+        - tag: '${input.cloud_type}'
   Cloud_Machine:
     type: Cloud.Machine
     properties:
       customizationSpec: '${starts_with(to_lower(input.image),"windows") == true ? "KPSC-Windows_Domain" : "KPSC-Linux"}'
       image: '${input.image}'
-      flavor: '${"generic."+to_lower(input.flavor)}'
+      flavor: '${input.flavor}'
       constraints:
-        - tag: '${"cloud_type:"+to_lower(input.cloud_type)}'
-        - tag: '${"env:"+to_lower(input.environment)}'
+        - tag: '${input.cloud_type}'
+        - tag: '${input.environment}'
       networks:
         - network: '${resource.Cloud_Network.id}'
           assignment: static
