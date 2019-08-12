@@ -1,6 +1,6 @@
 name: IaC Progression Demo (GitHub)
 description: This is a sample blueprint that should be a mirror of the "IaC Progression Demo" blueprint in Demo project inside CAS. This blueprint accomplishes the same task, but is source controlled within GitHub and imported to CAS.
-version: 20190812.1
+version: 1
 formatVersion: 1
 inputs:
   cloud_type:
