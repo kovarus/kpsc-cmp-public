@@ -50,6 +50,12 @@ inputs:
       - Windows Server 2016
       - Ubuntu 16.04 LTS
       - Ubuntu 18.04
+  password:
+    type: string
+    title: Password
+    description: The password for the admin (root on Linux, administrator on Windows) account of the server
+    encrypted: true
+    writeOnly: true
 resources:
   Cloud_Network:
     type: Cloud.Network
@@ -69,3 +75,14 @@ resources:
       networks:
         - network: '${resource.Cloud_Network.id}'
           assignment: static
+  Puppet_WebServer:
+    type: Cloud.Puppet
+    properties:
+      account: puppet.kpsc.io
+      environment: development
+      role: '${starts_with(to_lower(input.image),"windows") == true ? "role::windows_webserver" : "role::linux_webserver"}'
+      count: '${input.server_count}'
+      host: '${resource.Cloud_WebServer.*}'
+      osType: '${starts_with(to_lower(input.image),"windows") == true ? "windows" : "linux"}'
+      username: '${starts_with(to_lower(input.image),"windows") == true ? "administrator" : "root"}'
+      password: ${input.password}
